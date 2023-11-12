@@ -1,10 +1,11 @@
 <svelte:options runes={true} />
 
 <script>
+  import { selector } from 'svelte';
 
-  let rowId = $state(1);
+  let rowId = 1;
   let data = $state([]);
-  let selected = $state(undefined);
+  const selected = selector();
 
   const adjectives = [
     "pretty",
@@ -99,21 +100,19 @@
     return Math.round(Math.random() * 1000) % max;
   }
 
-  function createItem() {
-    let label = $state(`${adjectives[_random(adjectives.length)]} ${
-      colours[_random(colours.length)]
-    } ${nouns[_random(nouns.length)]}`);
+  class Item {
+		id = rowId++;
+		label = $state(
+			`${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`,
+		);
+	}
 
-    return {
-      id: rowId++,
-      label,
-    };
-  }
+
 
   function buildData(count = 1000) {
     const data = new Array(count);
     for (let i = 0; i < count; i++) {
-      data[i] = createItem();
+      data[i] = new Item();
     }
     return data;
   }
@@ -181,15 +180,19 @@
 <table class="table table-hover table-striped test-data">
   <tbody>
     {#each data as row (row.id)}
-      <tr class={selected === row.id ? "danger" : ""}
-        ><td class="col-md-1">{row.id}</td><td class="col-md-4"
-          ><a on:click={() => (selected = row.id)}>{row.label}</a></td
-        ><td class="col-md-1"
-          ><a on:click={() => remove(row)}
-            ><span class="glyphicon glyphicon-remove" aria-hidden="true" /></a
-          ></td
-        ><td class="col-md-6" /></tr
-      >
+    <tr class={selected.is(row.id) ? 'danger' : ''}
+    ><td class="col-md-1">{row.id}</td><td class="col-md-4"
+      ><a
+        on:click={() => {
+          selected.set(row.id);
+        }}>{row.label}</a
+      ></td
+    ><td class="col-md-1"
+      ><a on:click={() => remove(row)}
+        ><span class="glyphicon glyphicon-remove" aria-hidden="true" /></a
+      ></td
+    ><td class="col-md-6" /></tr
+  >
     {/each}
   </tbody>
 </table>
