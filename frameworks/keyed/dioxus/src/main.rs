@@ -5,7 +5,7 @@ use js_sys::Math;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn main() {
-    launch(app);
+    dioxus_web::launch::launch(app, Default::default(), Default::default());
 }
 
 #[component]
